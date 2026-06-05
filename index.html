@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yincana Parkinson - Respuesta A</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --easy: #16a34a;
+      --medium: #ca8a04;
+      --hard: #dc2626;
+      --rescue: #7c3aed;
+      --correct-bg: #dcfce7;
+      --correct-border: #16a34a;
+      --correct-text: #166534;
+      --wrong-bg: #fee2e2;
+      --wrong-border: #dc2626;
+      --wrong-text: #991b1b;
+      --shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(135deg, #111827, #1e3a8a);
+      color: white;
+      padding: 28px 18px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    header p {
+      margin: 0;
+      color: #dbeafe;
+      font-size: 15px;
+    }
+
+    main {
+      width: min(1050px, 94%);
+      margin: 24px auto 60px;
+    }
+
+    .instructions {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    .instructions strong {
+      color: var(--primary);
+    }
+
+    .section-title {
+      margin: 30px 0 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: white;
+      font-size: 20px;
+    }
+
+    .facil { background: var(--easy); }
+    .intermedia { background: var(--medium); }
+    .dificil { background: var(--hard); }
+    .salvatoria { background: var(--rescue); }
+
+    .question-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    .question-card h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      color: #111827;
+    }
+
+    .points {
+      display: inline-block;
+      margin-bottom: 10px;
+      background: #eff6ff;
+      color: var(--primary-dark);
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .options {
+      margin: 10px 0 0;
+      padding-left: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .option-btn {
+      width: 100%;
+      text-align: left;
+      padding: 11px 12px;
+      border-radius: 12px;
+      background: #f9fafb;
+      border: 1px solid #eef2f7;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1.35;
+      transition: 0.15s ease;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      transform: translateY(-1px);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+
+    .option-btn.correct {
+      background: var(--correct-bg);
+      border: 2px solid var(--correct-border);
+      color: var(--correct-text);
+      font-weight: 700;
+    }
+
+    .option-btn.wrong {
+      background: var(--wrong-bg);
+      border: 2px solid var(--wrong-border);
+      color: var(--wrong-text);
+      font-weight: 700;
+    }
+
+    .status {
+      display: none;
+      margin-top: 10px;
+      font-weight: 700;
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
+
+    .status.ok {
+      display: block;
+      background: var(--correct-bg);
+      color: var(--correct-text);
+      border: 1px solid var(--correct-border);
+    }
+
+    .status.bad {
+      display: block;
+      background: var(--wrong-bg);
+      color: var(--wrong-text);
+      border: 1px solid var(--wrong-border);
+    }
+
+    .term {
+      color: var(--primary-dark);
+      background: #eef2ff;
+      border-bottom: 2px dotted var(--primary);
+      padding: 1px 5px;
+      border-radius: 6px;
+      cursor: help;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    .term:hover {
+      background: #dbeafe;
+    }
+
+    .tooltip-box {
+      position: fixed;
+      max-width: 310px;
+      background: #111827;
+      color: white;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.35;
+      box-shadow: var(--shadow);
+      z-index: 9999;
+      display: none;
+    }
+
+    .tooltip-box::before {
+      content: "";
+      position: absolute;
+      top: -8px;
+      left: 18px;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid #111827;
+    }
+
+    .tooltip-title {
+      display: block;
+      font-weight: 700;
+      color: #bfdbfe;
+      margin-bottom: 4px;
+    }
+
+    .close-tip {
+      float: right;
+      border: none;
+      background: transparent;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 18px;
+    }
+
+    .reset-btn {
+      border: none;
+      background: #111827;
+      color: white;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .reset-btn:hover {
+      background: #374151;
+    }
+
+    footer {
+      width: min(1050px, 94%);
+      margin: 0 auto 30px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 560px) {
+      header h1 { font-size: 22px; }
+      .question-card { padding: 14px; }
+      .tooltip-box { max-width: calc(100vw - 32px); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Yincana: Parkinson</h1>
+    <p>Preguntas interactivas: en este archivo la respuesta correcta siempre es la A</p>
+  </header>
+
+  <main>
+    <div class="instructions">
+      <strong>Cómo usar:</strong> oprime una opción. Si está correcta se marca en verde. Si está incorrecta se marca en rojo y también se muestra cuál era la correcta en verde.
+      En este archivo, la respuesta correcta siempre es la opción A. La terminología aparece en todas las opciones para que se pueda estudiar sin que solo la correcta tenga definición.
+    </div>
+
+    <div class="top-actions">
+      <button class="reset-btn" onclick="resetQuiz()">Reiniciar respuestas</button>
+    </div>
+
+    <div id="quiz"></div>
+  </main>
+
+  <div id="tooltip" class="tooltip-box"></div>
+
+  <footer>
+    Yincana Parkinson - Sistema Nervioso y de los Sentidos
+  </footer>
+
+  <script>
+    const questions = [
+      {
+        section: "Preguntas fáciles",
+        sectionClass: "facil",
+        points: 5,
+        id: "F1",
+        question: '¿Cuál signo del caso se relaciona más con alteración de los <span class="term" data-title="Núcleos de la base" data-def="Estructuras profundas del cerebro que ayudan a regular el movimiento, la conducta y algunas funciones cognitivas.">núcleos de la base</span>?',
+        options: {
+          A: '<span class="term" data-title="Temblor de reposo" data-def="Movimiento involuntario que aparece cuando la extremidad está quieta. Es típico en Parkinson.">Temblor de reposo</span>',
+          B: '<span class="term" data-title="Ceguera súbita" data-def="Pérdida repentina de la visión.">Ceguera súbita</span>',
+          C: '<span class="term" data-title="Pérdida auditiva" data-def="Disminución parcial o total de la capacidad para escuchar.">Pérdida auditiva</span>',
+          D: '<span class="term" data-title="Dolor abdominal" data-def="Sensación dolorosa localizada en la zona del abdomen.">Dolor abdominal</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas fáciles",
+        sectionClass: "facil",
+        points: 5,
+        id: "F2",
+        question: "¿Qué núcleo de la base se relaciona más con la función motora?",
+        options: {
+          A: '<span class="term" data-title="Putamen" data-def="Parte de los núcleos de la base. Se relaciona principalmente con el control del movimiento.">Putamen</span>',
+          B: '<span class="term" data-title="Hipocampo" data-def="Estructura cerebral relacionada principalmente con memoria y aprendizaje.">Hipocampo</span>',
+          C: '<span class="term" data-title="Amígdala" data-def="Estructura cerebral relacionada con emociones, especialmente miedo y respuesta emocional.">Amígdala</span>',
+          D: '<span class="term" data-title="Bulbo olfatorio" data-def="Estructura que participa en el procesamiento inicial de los olores.">Bulbo olfatorio</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas fáciles",
+        sectionClass: "facil",
+        points: 5,
+        id: "F3",
+        question: '¿Qué estructura funciona como relevo para llevar información hacia la <span class="term" data-title="Corteza motora" data-def="Zona de la corteza cerebral encargada de planear y ejecutar movimientos voluntarios.">corteza motora</span>?',
+        options: {
+          A: '<span class="term" data-title="Tálamo" data-def="Estructura cerebral que funciona como estación de relevo: recibe información y la envía hacia áreas de la corteza.">Tálamo</span>',
+          B: '<span class="term" data-title="Médula espinal" data-def="Parte del sistema nervioso central que comunica el encéfalo con el cuerpo.">Médula espinal</span> solamente',
+          C: '<span class="term" data-title="Cerebelo" data-def="Estructura que coordina movimientos, equilibrio y precisión.">Cerebelo</span> únicamente',
+          D: '<span class="term" data-title="Nervio óptico" data-def="Nervio que lleva información visual desde la retina hacia el cerebro.">Nervio óptico</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas fáciles",
+        sectionClass: "facil",
+        points: 5,
+        id: "F4",
+        question: '¿Cuál <span class="term" data-title="Neurotransmisor" data-def="Sustancia química que permite la comunicación entre neuronas.">neurotransmisor</span> se relaciona más con Parkinson?',
+        options: {
+          A: '<span class="term" data-title="Dopamina" data-def="Neurotransmisor importante para el movimiento, la motivación y la recompensa. En Parkinson disminuye en circuitos motores.">Dopamina</span>',
+          B: '<span class="term" data-title="Histamina" data-def="Sustancia relacionada con respuestas alérgicas, inflamación y funciones del sistema nervioso.">Histamina</span>',
+          C: '<span class="term" data-title="Melatonina" data-def="Hormona relacionada con la regulación del sueño y el ciclo día-noche.">Melatonina</span>',
+          D: '<span class="term" data-title="Adrenalina periférica" data-def="Sustancia relacionada con la respuesta de alerta del cuerpo, como aumento de frecuencia cardiaca.">Adrenalina periférica</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas fáciles",
+        sectionClass: "facil",
+        points: 5,
+        id: "F5",
+        question: '¿Qué significa <span class="term" data-title="Hipocinesia" data-def="Disminución de la cantidad, amplitud o facilidad para iniciar el movimiento.">hipocinesia</span>?',
+        options: {
+          A: '<span class="term" data-title="Disminución del movimiento" data-def="Reducción de la cantidad, velocidad o amplitud con la que una persona se mueve.">Disminución del movimiento</span>',
+          B: '<span class="term" data-title="Aumento exagerado del movimiento" data-def="Exceso de movimiento o movimientos más amplios de lo esperado.">Aumento exagerado del movimiento</span>',
+          C: '<span class="term" data-title="Sensibilidad visual" data-def="Capacidad de percibir estímulos relacionados con la visión.">Pérdida de sensibilidad visual</span>',
+          D: '<span class="term" data-title="Dolor por temperatura extrema" data-def="Dolor producido por estímulos muy calientes o muy fríos.">Dolor por temperatura extrema</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas intermedias",
+        sectionClass: "intermedia",
+        points: 10,
+        id: "I1",
+        question: "¿Por qué el putamen ayuda a explicar los síntomas motores del caso?",
+        options: {
+          A: 'Porque participa en <span class="term" data-title="Circuitos motores" data-def="Redes del sistema nervioso que ayudan a iniciar, controlar y ajustar los movimientos.">circuitos motores</span> de los núcleos de la base',
+          B: 'Porque produce <span class="term" data-title="Líquido cefalorraquídeo" data-def="Líquido que rodea y protege el encéfalo y la médula espinal.">líquido cefalorraquídeo</span>',
+          C: 'Porque recibe <span class="term" data-title="Información auditiva primaria" data-def="Información inicial relacionada con los sonidos que llega al sistema nervioso.">información auditiva primaria</span>',
+          D: 'Porque controla exclusivamente el <span class="term" data-title="Olfato" data-def="Sentido que permite percibir olores.">olfato</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas intermedias",
+        sectionClass: "intermedia",
+        points: 10,
+        id: "I2",
+        question: 'En los núcleos de la base, ¿qué hace la <span class="term" data-title="Vía directa" data-def="Circuito de los núcleos de la base que facilita la activación de la corteza motora y favorece el movimiento.">vía directa</span>?',
+        options: {
+          A: 'Facilita el <span class="term" data-title="Movimiento" data-def="Acción motora producida por la activación coordinada del sistema nervioso y los músculos.">movimiento</span>',
+          B: '<span class="term" data-title="Bloqueo del movimiento" data-def="Dificultad o freno para iniciar o ejecutar movimientos.">Bloquea movimientos</span> siempre todos los movimientos',
+          C: 'Lleva <span class="term" data-title="Dolor y temperatura" data-def="Modalidades sensitivas que permiten detectar daño, calor o frío.">dolor y temperatura</span>',
+          D: 'Controla exclusivamente la <span class="term" data-title="Visión" data-def="Sentido que permite percibir luz, formas, colores y movimiento.">visión</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas intermedias",
+        sectionClass: "intermedia",
+        points: 10,
+        id: "I3",
+        question: 'En los núcleos de la base, ¿qué hace la <span class="term" data-title="Vía indirecta" data-def="Circuito de los núcleos de la base que ayuda a frenar movimientos no deseados.">vía indirecta</span>?',
+        options: {
+          A: 'Frena <span class="term" data-title="Movimientos no deseados" data-def="Movimientos que el sistema nervioso debe inhibir porque no corresponden a la acción que se quiere hacer.">movimientos no deseados</span>',
+          B: 'Aumenta siempre cualquier <span class="term" data-title="Movimiento" data-def="Acción motora producida por músculos bajo control del sistema nervioso.">movimiento</span>',
+          C: 'Lleva <span class="term" data-title="Información auditiva" data-def="Señales relacionadas con sonidos que son procesadas por el sistema nervioso.">información auditiva</span>',
+          D: 'Activa directamente los <span class="term" data-title="Músculos" data-def="Tejidos que se contraen para producir movimiento.">músculos</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas intermedias",
+        sectionClass: "intermedia",
+        points: 10,
+        id: "I4",
+        question: '¿Por qué el caso se relaciona más con núcleos de la base que con <span class="term" data-title="Cerebelo" data-def="Estructura del sistema nervioso que coordina movimientos, equilibrio y precisión.">cerebelo</span>?',
+        options: {
+          A: 'Porque hay <span class="term" data-title="Temblor de reposo" data-def="Temblor que aparece cuando la extremidad está quieta.">temblor de reposo</span>, <span class="term" data-title="Rigidez" data-def="Aumento del tono muscular que dificulta mover una articulación.">rigidez</span> e <span class="term" data-title="Hipocinesia" data-def="Disminución del movimiento.">hipocinesia</span>',
+          B: 'Porque hay <span class="term" data-title="Ataxia" data-def="Alteración de la coordinación; la persona puede verse torpe o inestable al moverse.">ataxia</span>, <span class="term" data-title="Dismetría" data-def="Error al calcular la distancia o fuerza de un movimiento.">dismetría</span> y <span class="term" data-title="Temblor de intención" data-def="Temblor que aparece al intentar realizar un movimiento dirigido.">temblor de intención</span>',
+          C: 'Porque hay <span class="term" data-title="Pérdida completa de visión" data-def="Ausencia total de percepción visual.">pérdida completa de visión</span>',
+          D: 'Porque hay <span class="term" data-title="Sordera súbita" data-def="Pérdida repentina de la audición.">sordera súbita</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas intermedias",
+        sectionClass: "intermedia",
+        points: 10,
+        id: "I5",
+        question: '¿Qué diferencia hay entre <span class="term" data-title="Temblor de reposo" data-def="Temblor que aparece cuando la extremidad está quieta.">temblor de reposo</span> y <span class="term" data-title="Temblor de intención" data-def="Temblor que aparece o aumenta cuando la persona intenta realizar un movimiento dirigido.">temblor de intención</span>?',
+        options: {
+          A: 'El de reposo aparece con la <span class="term" data-title="Extremidad quieta" data-def="Brazo o pierna sin movimiento voluntario en ese momento.">extremidad quieta</span>; el de intención aparece al intentar hacer un <span class="term" data-title="Movimiento dirigido" data-def="Movimiento realizado con un objetivo específico, como tocar un punto.">movimiento dirigido</span>',
+          B: 'El de reposo aparece solo al <span class="term" data-title="Caminar" data-def="Movimiento coordinado de las piernas para desplazarse.">caminar</span>',
+          C: 'El de intención aparece solo durante el <span class="term" data-title="Sueño" data-def="Estado fisiológico de descanso con disminución de la respuesta al ambiente.">sueño</span>',
+          D: 'Son exactamente iguales en su <span class="term" data-title="Manifestación clínica" data-def="Forma en que un signo o síntoma aparece en el paciente.">manifestación clínica</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas difíciles",
+        sectionClass: "dificil",
+        points: 15,
+        id: "D1",
+        question: "¿Por qué la falta de dopamina puede producir hipocinesia?",
+        options: {
+          A: 'Porque disminuye los <span class="term" data-title="Circuitos que facilitan el movimiento" data-def="Redes nerviosas que ayudan a activar la corteza motora para producir movimiento.">circuitos que facilitan el movimiento</span> y aumenta los que lo frenan',
+          B: 'Porque destruye directamente el <span class="term" data-title="Músculo" data-def="Tejido que se contrae para producir movimiento.">músculo</span>',
+          C: 'Porque bloquea la <span class="term" data-title="Sensibilidad auditiva" data-def="Capacidad de detectar y procesar sonidos.">sensibilidad auditiva</span>',
+          D: 'Porque impide la producción de <span class="term" data-title="Líquido cefalorraquídeo" data-def="Líquido que rodea y protege el encéfalo y la médula espinal.">líquido cefalorraquídeo</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas difíciles",
+        sectionClass: "dificil",
+        points: 15,
+        id: "D2",
+        question: '¿Qué pasa si el tálamo queda demasiado <span class="term" data-title="Inhibido" data-def="Con menor actividad o con su función frenada. En este caso, significa que envía menos activación a la corteza motora.">inhibido</span> en el circuito motor?',
+        options: {
+          A: 'La <span class="term" data-title="Corteza motora" data-def="Área cerebral que participa en el control de movimientos voluntarios.">corteza motora</span> recibe menos activación y disminuye el movimiento',
+          B: 'La <span class="term" data-title="Corteza visual" data-def="Área cerebral que procesa información relacionada con la visión.">corteza visual</span> deja de ver colores',
+          C: 'El <span class="term" data-title="Oído interno" data-def="Parte del oído que participa en audición y equilibrio.">oído interno</span> deja de detectar sonido',
+          D: 'Los <span class="term" data-title="Receptores del dolor" data-def="Terminaciones nerviosas que detectan estímulos dañinos o potencialmente dañinos.">receptores del dolor</span> se activan por frío extremo'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas difíciles",
+        sectionClass: "dificil",
+        points: 15,
+        id: "D3",
+        question: "¿Cuál es la mejor explicación funcional de los núcleos de la base?",
+        options: {
+          A: 'Ayudan a seleccionar, facilitar o frenar <span class="term" data-title="Movimientos" data-def="Acciones motoras organizadas por el sistema nervioso.">movimientos</span>',
+          B: 'Generan <span class="term" data-title="Contracción muscular directa" data-def="Acortamiento del músculo que produce fuerza o movimiento.">contracción muscular directa</span>',
+          C: 'Son la vía principal del <span class="term" data-title="Dolor y temperatura" data-def="Modalidades sensitivas que permiten detectar daño, calor o frío.">dolor y temperatura</span>',
+          D: 'Son <span class="term" data-title="Receptores sensoriales" data-def="Estructuras que detectan estímulos como presión, temperatura, luz o dolor.">receptores sensoriales</span> de la piel'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas difíciles",
+        sectionClass: "dificil",
+        points: 15,
+        id: "D4",
+        question: '¿Por qué el Parkinson se considera un trastorno <span class="term" data-title="Hipocinético" data-def="Que se caracteriza por disminución del movimiento.">hipocinético</span>?',
+        options: {
+          A: 'Porque disminuye la facilidad para <span class="term" data-title="Iniciar y mantener movimientos" data-def="Comenzar una acción motora y sostenerla de forma adecuada.">iniciar y mantener movimientos</span>',
+          B: 'Porque aumenta exageradamente todos los <span class="term" data-title="Movimientos" data-def="Acciones motoras producidas por el sistema nervioso y los músculos.">movimientos</span>',
+          C: 'Porque produce solo <span class="term" data-title="Alteraciones sensitivas" data-def="Cambios en la percepción de estímulos como tacto, dolor, temperatura o vibración.">alteraciones sensitivas</span>',
+          D: 'Porque afecta exclusivamente el <span class="term" data-title="Sistema visual" data-def="Conjunto de estructuras que permiten recibir y procesar la información de la visión.">sistema visual</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas difíciles",
+        sectionClass: "dificil",
+        points: 15,
+        id: "D5",
+        question: "¿Cuál afirmación relaciona mejor el caso con lo estudiado en núcleos de la base?",
+        options: {
+          A: 'El compromiso del <span class="term" data-title="Putamen" data-def="Parte de los núcleos de la base relacionada con control motor.">putamen</span> y la alteración de <span class="term" data-title="Dopamina" data-def="Neurotransmisor importante para regular circuitos motores.">dopamina</span> explican síntomas como temblor, rigidez e hipocinesia',
+          B: 'El compromiso del <span class="term" data-title="Hipocampo" data-def="Estructura cerebral relacionada principalmente con memoria y aprendizaje.">hipocampo</span> explica el temblor de reposo',
+          C: 'La lesión del <span class="term" data-title="Nervio óptico" data-def="Nervio que lleva información visual desde la retina hacia el cerebro.">nervio óptico</span> explica la rigidez',
+          D: 'La alteración del <span class="term" data-title="Bulbo olfatorio" data-def="Estructura que participa en el procesamiento inicial de los olores.">bulbo olfatorio</span> explica la hipocinesia'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas salvatorias",
+        sectionClass: "salvatoria",
+        points: 3,
+        id: "S1",
+        question: "¿Qué estructura de los núcleos de la base se asocia más con movimiento?",
+        options: {
+          A: '<span class="term" data-title="Putamen" data-def="Parte de los núcleos de la base relacionada principalmente con el control motor.">Putamen</span>',
+          B: '<span class="term" data-title="Hipocampo" data-def="Estructura cerebral relacionada principalmente con memoria y aprendizaje.">Hipocampo</span>',
+          C: '<span class="term" data-title="Amígdala" data-def="Estructura cerebral relacionada con emociones y respuesta emocional.">Amígdala</span>',
+          D: '<span class="term" data-title="Retina" data-def="Capa del ojo que contiene receptores para captar luz.">Retina</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas salvatorias",
+        sectionClass: "salvatoria",
+        points: 3,
+        id: "S2",
+        question: "¿Qué neurotransmisor disminuye en Parkinson?",
+        options: {
+          A: '<span class="term" data-title="Dopamina" data-def="Neurotransmisor importante para el movimiento. En Parkinson disminuye en circuitos motores.">Dopamina</span>',
+          B: '<span class="term" data-title="Melatonina" data-def="Hormona relacionada con el sueño y el ciclo día-noche.">Melatonina</span>',
+          C: '<span class="term" data-title="Histamina" data-def="Sustancia relacionada con inflamación, alergias y algunas funciones nerviosas.">Histamina</span>',
+          D: '<span class="term" data-title="Insulina" data-def="Hormona que ayuda a regular la glucosa en la sangre.">Insulina</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas salvatorias",
+        sectionClass: "salvatoria",
+        points: 3,
+        id: "S3",
+        question: "¿La hipocinesia significa aumento o disminución del movimiento?",
+        options: {
+          A: '<span class="term" data-title="Disminución" data-def="Reducción o menor cantidad de algo. En este caso, del movimiento.">Disminución</span>',
+          B: '<span class="term" data-title="Aumento" data-def="Incremento o mayor cantidad de algo.">Aumento</span>',
+          C: '<span class="term" data-title="Pérdida visual" data-def="Disminución o ausencia de la capacidad para ver.">Pérdida visual</span>',
+          D: '<span class="term" data-title="Pérdida auditiva" data-def="Disminución o ausencia de la capacidad para escuchar.">Pérdida auditiva</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas salvatorias",
+        sectionClass: "salvatoria",
+        points: 3,
+        id: "S4",
+        question: "¿Qué vía facilita el movimiento en los núcleos de la base?",
+        options: {
+          A: '<span class="term" data-title="Vía directa" data-def="Circuito de los núcleos de la base que facilita el movimiento.">Vía directa</span>',
+          B: '<span class="term" data-title="Vía espinotalámica" data-def="Vía sensitiva que lleva dolor, temperatura y tacto grosero hacia el sistema nervioso central.">Vía espinotalámica</span>',
+          C: '<span class="term" data-title="Vía óptica" data-def="Ruta por donde viaja la información visual desde el ojo hacia el cerebro.">Vía óptica</span>',
+          D: '<span class="term" data-title="Vía auditiva" data-def="Ruta por donde viaja la información del sonido hacia el cerebro.">Vía auditiva</span>'
+        },
+        correct: "A"
+      },
+      {
+        section: "Preguntas salvatorias",
+        sectionClass: "salvatoria",
+        points: 3,
+        id: "S5",
+        question: "¿Qué estructura lleva información hacia la corteza motora dentro del circuito de núcleos de la base?",
+        options: {
+          A: '<span class="term" data-title="Tálamo" data-def="Estructura que funciona como relevo de información hacia la corteza cerebral.">Tálamo</span>',
+          B: '<span class="term" data-title="Cóclea" data-def="Estructura del oído interno que participa en la audición.">Cóclea</span>',
+          C: '<span class="term" data-title="Retina" data-def="Capa del ojo que capta estímulos luminosos.">Retina</span>',
+          D: '<span class="term" data-title="Piel" data-def="Órgano que contiene receptores para tacto, presión, temperatura y dolor.">Piel</span>'
+        },
+        correct: "A"
+      }
+    ];
+
+    function renderQuiz() {
+      const quiz = document.getElementById("quiz");
+      quiz.innerHTML = "";
+      let currentSection = "";
+
+      questions.forEach((q, index) => {
+        if (q.section !== currentSection) {
+          currentSection = q.section;
+          quiz.insertAdjacentHTML("beforeend", `<h2 class="section-title ${q.sectionClass}">${q.section}</h2>`);
+        }
+
+        const optionsHtml = Object.entries(q.options)
+          .map(([letter, text]) => `
+            <li>
+              <button class="option-btn" data-letter="${letter}" onclick="selectAnswer(${index}, '${letter}', this)">
+                <strong>${letter}.</strong> ${text}
+              </button>
+            </li>
+          `)
+          .join("");
+
+        quiz.insertAdjacentHTML("beforeend", `
+          <section class="question-card" id="card-${index}">
+            <span class="points">${q.points} puntos</span>
+            <h3>${q.id}. ${q.question}</h3>
+            <ul class="options">${optionsHtml}</ul>
+            <div class="status" id="status-${index}"></div>
+          </section>
+        `);
+      });
+
+      attachTermEvents();
+    }
+
+    function selectAnswer(index, letter, button) {
+      const q = questions[index];
+      const card = document.getElementById(`card-${index}`);
+      const buttons = card.querySelectorAll(".option-btn");
+      const status = document.getElementById(`status-${index}`);
+
+      buttons.forEach(btn => {
+        btn.disabled = true;
+        if (btn.getAttribute("data-letter") === q.correct) {
+          btn.classList.add("correct");
+        }
+      });
+
+      if (letter === q.correct) {
+        button.classList.add("correct");
+        status.className = "status ok";
+        status.textContent = "Correcto";
+      } else {
+        button.classList.add("wrong");
+        status.className = "status bad";
+        status.textContent = "Incorrecto";
+      }
+    }
+
+    function resetQuiz() {
+      renderQuiz();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    const tooltip = document.getElementById("tooltip");
+
+    function closeTooltip() {
+      tooltip.style.display = "none";
+      tooltip.innerHTML = "";
+    }
+
+    function attachTermEvents() {
+      document.querySelectorAll(".term").forEach(term => {
+        term.addEventListener("click", function(event) {
+          event.stopPropagation();
+
+          const title = this.getAttribute("data-title");
+          const def = this.getAttribute("data-def");
+          const rect = this.getBoundingClientRect();
+
+          tooltip.innerHTML = `
+            <button class="close-tip" onclick="event.stopPropagation(); document.getElementById('tooltip').style.display='none';">×</button>
+            <span class="tooltip-title">${title}</span>
+            ${def}
+          `;
+
+          tooltip.style.display = "block";
+
+          let left = rect.left;
+          let top = rect.bottom + 10;
+
+          const tooltipWidth = 310;
+          if (left + tooltipWidth > window.innerWidth - 16) {
+            left = window.innerWidth - tooltipWidth - 16;
+          }
+
+          if (left < 16) left = 16;
+
+          if (top + 130 > window.innerHeight) {
+            top = rect.top - 135;
+          }
+
+          tooltip.style.left = left + "px";
+          tooltip.style.top = top + "px";
+        });
+      });
+    }
+
+    document.addEventListener("click", closeTooltip);
+    window.addEventListener("scroll", closeTooltip);
+    window.addEventListener("resize", closeTooltip);
+
+    renderQuiz();
+  </script>
+</body>
+</html>
